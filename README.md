@@ -94,21 +94,97 @@ Two PySR models are trained:
 ├─ LICENSE
 └─ .gitignore
 
----
 
-## 4. Setup
+The notebook KAN_Symbolic_TargetOnly_FILLED.ipynb is self-contained:
+running all cells will:
 
-See environment.yml for dependencies. Typical usage:
+Generate the dataset from the analytic target signal.
 
+Train and refine the KAN model.
+
+Run auto_symbolic on a copy of KAN to obtain a symbolic model.
+
+Fit PySR (direct & distilled).
+
+Compute test MSE / 
+𝑅
+2
+R
+2
+ for all four models.
+
+Plot the target signal vs each fitted model on the full interval.
+
+4. Setup
+
+I use conda and Python 3.10+.
+
+4.1 Create the environment
 conda env create -f environment.yml
 conda activate kan-symbolic-signal
 
-# First-time PySR Julia setup:
+4.2 Install PySR (Julia side)
+
+PySR requires Julia ≥ 1.9 installed on your system and available
+on PATH.
+
+The first time you use PySR, run:
+
 python -c "from pysr import PySRRegressor; PySRRegressor().install()"
 
+
+This will install the required Julia packages.
+
+4.3 Run the notebook
 jupyter notebook notebooks/KAN_Symbolic_TargetOnly_FILLED.ipynb
 
----
+
+Then execute all cells from top to bottom.
+
+5. Example results
+
+On the held-out test split, a typical run yields results similar to:
+
+Method	MSE (test)	R² (test)
+KAN (numeric)	~1.2e-7	~1.000000
+KAN (symbolic on copy)	~1.1e+0	~0.01
+PySR (direct on data)	~2.0e-1	~0.82
+PySR (distilled KAN)	~2.0e-1	~0.82
+
+In addition to metrics, the notebook also generates five plots:
+
+True target signal.
+
+Target vs KAN (numeric).
+
+Target vs KAN (symbolic).
+
+Target vs PySR (direct).
+
+Target vs PySR (distilled).
+
+These plots provide an intuitive visual comparison of how well each
+method fits the signal.
+
+6. Possible extensions
+
+Some natural extensions that could be explored:
+
+Using richer operator libraries for PySR (e.g. /, ^, cos) with
+regularization to control complexity.
+
+Trying different KAN architectures (width / grid schedules) and
+symbolic libraries.
+
+Applying the same pipeline to real-world time series instead of a
+synthetic signal.
+
+Comparing with other symbolic regression baselines.
+
+7. License
+
+This project is released under the MIT License. See LICENSE for
+details.
 
 ## 5. License
 
