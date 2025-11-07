@@ -22,15 +22,18 @@ The goal is to:
 
 The target is a combination of harmonic components and a chirp term:
 
-\[
-f(x) = \frac{4}{\pi}\sin(2\pi 10x)
-     + \frac{4}{3\pi}\sin(2\pi 30x)
-     + \frac{2}{\pi}\sin\bigl(2\pi(50x + 20x^2)\bigr), \quad x \in [-0.5, 0.5]
-\]
+- (4 / π) · sin(2π · 10x)
+- (4 / (3π)) · sin(2π · 30x)
+- (2 / π) · sin(2π · (50x + 20x²))
+
+on the interval x ∈ [-0.5, 0.5].
 
 - Sampling rate: **15 kHz**, giving 15,000 samples on the interval.
 - Data split: **80% train / 20% test**, and all methods use the same
   test split for a fair comparison.
+
+(If your Markdown viewer does not render the inline math nicely, see the
+code comments inside the notebook for the exact formula.)
 
 ---
 
@@ -55,7 +58,7 @@ I use Ziming Liu's `pykan` library with:
 Two KAN-based models are evaluated:
 
 1. **KAN (numeric)** – the final numeric model after refinement.
-2. **KAN (symbolic on copy)** – a copy of the trained model processed by
+2. **KAN (symbolic on copy)** – a copy of the trained model processed by  
    `model.auto_symbolic(lib=['sin', 'x', 'x^2'])` and lightly re-fit.
 
 ### 2.2 PySR (symbolic regression)
@@ -75,7 +78,7 @@ I use [PySR](https://github.com/MilesCranmer/PySR):
 Two PySR models are trained:
 
 1. **PySR (direct on data)** – fits the true targets `y`.
-2. **PySR (distilled from KAN)** – fits the KAN outputs
+2. **PySR (distilled from KAN)** – fits the KAN outputs  
    `y_kan = model(x)` (teacher–student distillation),
    but evaluation is still against the true `y`.
 
@@ -87,105 +90,99 @@ Two PySR models are trained:
 .
 ├─ notebooks/
 │   └─ KAN_Symbolic_TargetOnly_FILLED.ipynb   # main experiment notebook
-├─ figs/                                      # saved figures
-├─ outputs/                                   # PySR output directories
+├─ figs/                                      # saved figures (optional)
+├─ outputs/                                   # PySR output directories (optional)
 ├─ environment.yml
 ├─ README.md
 ├─ LICENSE
 └─ .gitignore
+```
 
+The notebook `KAN_Symbolic_TargetOnly_FILLED.ipynb` is self-contained.
+Running all cells will:
 
-The notebook KAN_Symbolic_TargetOnly_FILLED.ipynb is self-contained:
-running all cells will:
+1. Generate the dataset from the analytic target signal.
+2. Train and refine the KAN model.
+3. Run `auto_symbolic` on a copy of KAN to obtain a symbolic model.
+4. Fit PySR (direct & distilled).
+5. Compute test MSE and R² for all four models.
+6. Plot the target signal vs each fitted model on the full interval.
 
-Generate the dataset from the analytic target signal.
+---
 
-Train and refine the KAN model.
+## 4. Setup
 
-Run auto_symbolic on a copy of KAN to obtain a symbolic model.
+I use **conda** and **Python 3.10+**.
 
-Fit PySR (direct & distilled).
+### 4.1 Create the environment
 
-Compute test MSE / 
-𝑅
-2
-R
-2
- for all four models.
-
-Plot the target signal vs each fitted model on the full interval.
-
-4. Setup
-
-I use conda and Python 3.10+.
-
-4.1 Create the environment
+```bash
 conda env create -f environment.yml
 conda activate kan-symbolic-signal
+```
 
-4.2 Install PySR (Julia side)
+### 4.2 Install PySR (Julia side)
 
-PySR requires Julia ≥ 1.9 installed on your system and available
-on PATH.
+PySR requires **Julia ≥ 1.9** installed on your system and available
+on `PATH`.
 
 The first time you use PySR, run:
 
+```bash
 python -c "from pysr import PySRRegressor; PySRRegressor().install()"
-
+```
 
 This will install the required Julia packages.
 
-4.3 Run the notebook
-jupyter notebook notebooks/KAN_Symbolic_TargetOnly_FILLED.ipynb
+### 4.3 Run the notebook
 
+```bash
+jupyter notebook notebooks/KAN_Symbolic_TargetOnly_FILLED.ipynb
+```
 
 Then execute all cells from top to bottom.
 
-5. Example results
+---
+
+## 5. Example results
 
 On the held-out test split, a typical run yields results similar to:
 
-Method	MSE (test)	R² (test)
-KAN (numeric)	~1.2e-7	~1.000000
-KAN (symbolic on copy)	~1.1e+0	~0.01
-PySR (direct on data)	~2.0e-1	~0.82
-PySR (distilled KAN)	~2.0e-1	~0.82
+| Method                  | MSE (test) | R² (test) |
+|-------------------------|-----------:|----------:|
+| KAN (numeric)           | ~1.2e-7    | ~1.000000 |
+| KAN (symbolic on copy)  | ~1.1e+0    | ~0.01     |
+| PySR (direct on data)   | ~2.0e-1    | ~0.82     |
+| PySR (distilled KAN)    | ~2.0e-1    | ~0.82     |
 
 In addition to metrics, the notebook also generates five plots:
 
-True target signal.
-
-Target vs KAN (numeric).
-
-Target vs KAN (symbolic).
-
-Target vs PySR (direct).
-
-Target vs PySR (distilled).
+1. True target signal.
+2. Target vs **KAN (numeric)**.
+3. Target vs **KAN (symbolic)**.
+4. Target vs **PySR (direct)**.
+5. Target vs **PySR (distilled)**.
 
 These plots provide an intuitive visual comparison of how well each
 method fits the signal.
 
-6. Possible extensions
+---
+
+## 6. Possible extensions
 
 Some natural extensions that could be explored:
 
-Using richer operator libraries for PySR (e.g. /, ^, cos) with
-regularization to control complexity.
+- Using richer operator libraries for PySR (e.g. `/`, `^`, `cos`) with
+  regularization to control complexity.
+- Trying different KAN architectures (width / grid schedules) and
+  symbolic libraries.
+- Applying the same pipeline to real-world time series instead of a
+  synthetic signal.
+- Comparing with other symbolic regression baselines.
 
-Trying different KAN architectures (width / grid schedules) and
-symbolic libraries.
+---
 
-Applying the same pipeline to real-world time series instead of a
-synthetic signal.
+## 7. License
 
-Comparing with other symbolic regression baselines.
-
-7. License
-
-This project is released under the MIT License. See LICENSE for
+This project is released under the MIT License. See `LICENSE` for
 details.
-
-## 5. License
-
-MIT License. See LICENSE for details.
