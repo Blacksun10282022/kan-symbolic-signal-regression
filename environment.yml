@@ -1,0 +1,24 @@
+
+---
+
+## 3. environment.yml
+
+
+```yaml
+name: kan-symbolic-signal
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.10
+  - numpy
+  - pandas
+  - matplotlib
+  - scikit-learn
+  - pytorch
+  - jupyter
+  - pip
+  - pip:
+      - kan
+      - pysr
+      - juliacall

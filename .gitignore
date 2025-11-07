@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb~*
+
+# 虚拟环境
+.env/
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 实验输出目录（不想上传的大文件）
+fig_structure/
+figures/
+model/
+outputs/
