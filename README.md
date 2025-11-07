@@ -94,6 +94,8 @@ Two PySR models are trained:
 ├─ LICENSE
 └─ .gitignore
 
+---
+
 ## 4. Setup
 
 See environment.yml for dependencies. Typical usage:
@@ -105,6 +107,8 @@ conda activate kan-symbolic-signal
 python -c "from pysr import PySRRegressor; PySRRegressor().install()"
 
 jupyter notebook notebooks/KAN_Symbolic_TargetOnly_FILLED.ipynb
+
+---
 
 ## 5. License
 
